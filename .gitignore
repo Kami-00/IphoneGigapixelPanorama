@@ -1,0 +1,25 @@
+# Betriebssystem und lokale Werkzeuge
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# Lokale Konfiguration und Signierung
+.env
+.env.*
+!.env.example
+*.p12
+*.mobileprovision
+
+# Xcode-Benutzerdaten
+DerivedData/
+xcuserdata/
+*.xcuserstate
+
+# Aufnahmen und erzeugte Ergebnisse
+captures/
+data/raw/
+data/processed/
+exports/
+work/
