@@ -1,6 +1,12 @@
 # iPhoneGigapixelPanorama
 
-Mac-gesteuerte iPhone-Fotografie mit geplanten Erweiterungen für LiDAR, adaptive Fokus- und Belichtungsreihen, Rauschreduzierung und hochauflösende Tele-Panoramen.
+Mac-gesteuerte iPhone-Fotografie zur möglichst vollständig lesbaren Erfassung von Schildern, Etiketten und Gerätebeschriftungen in hochauflösenden Panoramen. Geplante Bausteine sind OCR, LiDAR, adaptive Fokus- und Belichtungsreihen, Rauschreduzierung und 3×-Detailaufnahmen.
+
+## Primäres Qualitätsziel: Text muss scharf sein
+
+Schilder, Etiketten und Gerätebeschriftungen haben Vorrang. OCR soll Textregionen finden und gezielte Folgeaufnahmen steuern. Entscheidend sind sichtbare, scharfe und passend belichtete Zeichen, einschließlich Zahlen und technischer Kennzeichnungen. Andere Bildbereiche dienen vor allem als Übersicht und zum Zusammensetzen; ihre Qualität allein löst keine zusätzlichen Fokus-/HDR-Aufnahmen aus.
+
+Der [Entwurf zur Textpriorität](docs/TEXT_PRIORITAET.md) beschreibt Textsuche, Autofokus auf Textflächen und die erneute Prüfung im fertigen Panorama. Bereits unscharfe oder kleine Schrift darf bei der Suche nicht verloren gehen; OCR-Vertrauen allein beweist keine optische Schärfe.
 
 ## Ausgangspunkt
 
@@ -20,7 +26,7 @@ Unterstützte Kombinationen aus Kamera, Auflösung, Fokussteuerung und Ausgabefo
 
 ## Geplante Erweiterungen
 
-1. **Adaptive Fokus- und Belichtungsmesspunkte:** Ein Bild auswerten, fehlende Details lokalisieren, gezielt neu fokussieren beziehungsweise belichten und die Verbesserung prüfen. Fokus und Belichtung werden getrennt gesteuert.
+1. **Adaptive Fokus- und Belichtungsmesspunkte:** Gefundene oder vermutete Textregionen auswerten, fehlende Zeichendetails lokalisieren, gezielt neu fokussieren beziehungsweise belichten und die Verbesserung prüfen. Fokus und Belichtung werden getrennt gesteuert.
 2. **LiDAR als Planungshilfe:** Relevante Entfernungen gruppieren und unnötige Fokusaufnahmen vermeiden. Die tatsächliche Bildschärfe bleibt das entscheidende Prüfkriterium.
 3. **Vierer-Rauschfusion auf dem iPhone:** Pro Kamera, Fokusstellung und Belichtung vier Aufnahmen ausrichten und robust zusammenführen. Bewegte Bereiche gesondert behandeln.
 4. **HDR für große Helligkeitsunterschiede:** Beispielsweise Innenraum und helle Außenansicht durch ein Fenster mit mehreren Aufnahmen erfassen.
