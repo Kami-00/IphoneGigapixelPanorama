@@ -2,6 +2,8 @@
 
 Stand: 2. November 2026. Neue Nutzerpriorität: Text soll scharf und lesbar erfasst werden; andere Bildbereiche sind für die gezielte Qualitätsverbesserung nachrangig. Dieses Ziel konkretisiert die regionalen Qualitätsziele aus [KONZEPT.md](KONZEPT.md) und [ENTWURF_AUFNAHMESTEUERUNG.md](ENTWURF_AUFNAHMESTEUERUNG.md).
 
+Priorisierte Motive sind **Schilder, Etiketten und Gerätebeschriftungen**. Zahlen, Typbezeichnungen und technische Kennzeichnungen brauchen besondere Aufmerksamkeit; ein plausibles Wort allein genügt dort nicht als Nachweis.
+
 Die folgende Erweiterung ist ein Entwurf für die vorhandene eigene iPhone-App und Mac-Software. Es wurde noch kein OCR-Aufnahmelauf implementiert oder am Gerät geprüft.
 
 ## 1. Konsequenz für die Aufnahmeplanung
