@@ -65,7 +65,7 @@ Dieser Ablauf ist ein Entwurf und muss an den vorhandenen Code angepasst werden.
 3. Den bisherigen Ablauf reproduzieren und dokumentieren.
 4. Die Erweiterungen nach dem [Arbeitsplan](docs/WEITERARBEITEN.md) einzeln prüfen.
 
-Das [technische Konzept](docs/KONZEPT.md) beschreibt Aufnahmeplanung, Aufgabenverteilung und Grenzen. Die [Quellen](docs/QUELLEN.md) trennen dokumentierte APIs, Forschung und noch zu prüfende Ableitungen.
+Das [technische Konzept](docs/KONZEPT.md) beschreibt Aufnahmeplanung, Aufgabenverteilung und Grenzen. Die [Quellen](docs/QUELLEN.md) trennen dokumentierte APIs, Forschung und noch zu prüfende Ableitungen. Weitere ungeprüfte Vorschläge, etwa zu Parallaxe am Gimbal und zum Gigapixel-Nachweis, sammelt [IDEEN_CLAUDE.md](docs/IDEEN_CLAUDE.md).
 
 ## Status und Lizenz
 
