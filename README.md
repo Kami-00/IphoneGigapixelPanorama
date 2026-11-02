@@ -67,6 +67,8 @@ Dieser Ablauf ist ein Entwurf und muss an den vorhandenen Code angepasst werden.
 
 Das [technische Konzept](docs/KONZEPT.md) beschreibt Aufnahmeplanung, Aufgabenverteilung und Grenzen. Die [Quellen](docs/QUELLEN.md) trennen dokumentierte APIs, Forschung und noch zu prüfende Ableitungen. Weitere ungeprüfte Vorschläge, etwa zu Parallaxe am Gimbal und zum Gigapixel-Nachweis, sammelt [IDEEN_CLAUDE.md](docs/IDEEN_CLAUDE.md).
 
+Der [Entwurf zur Aufnahmesteuerung](docs/ENTWURF_AUFNAHMESTEUERUNG.md) konkretisiert die adaptive Auswahl von Aufnahmegruppen, die Geometrie lokaler Viererfusionen und die zuverlässige Wiederaufnahme langer Sitzungen. Er enthält kleine Vergleichsversuche und präzisiert die bisherigen Auflösungs- und Parallaxerechnungen.
+
 ## Status und Lizenz
 
 Stand: 2. November 2026. Dokumentation und Entwurf; keine Builds oder Hardwaretests der geplanten Erweiterungen durchgeführt. Sprache, Frameworks und Protokolle des bestehenden Projekts sind hier noch nicht dokumentiert.
