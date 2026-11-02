@@ -1,5 +1,7 @@
 # Text als primäres Qualitätsziel
 
+**Aktuelle Priorität:** Zuerst ein einfacher 360°-Durchlauf aus 3×-Einzelbildern, genau ein Bild pro Position. Entrauschen ist optional und zunächst ausgeschaltet. Die nachfolgenden weiterführenden Verfahren sind spätere Ausbaustufen; maßgeblich sind [README](../README.md) und [Arbeitsplan](WEITERARBEITEN.md).
+
 Stand: 2. November 2026. Neue Nutzerpriorität: Text soll scharf und lesbar erfasst werden; andere Bildbereiche sind für die gezielte Qualitätsverbesserung nachrangig. Dieses Ziel konkretisiert die regionalen Qualitätsziele aus [KONZEPT.md](KONZEPT.md) und [ENTWURF_AUFNAHMESTEUERUNG.md](ENTWURF_AUFNAHMESTEUERUNG.md).
 
 Priorisierte Motive sind **Schilder, Etiketten und Gerätebeschriftungen**. Zahlen, Typbezeichnungen und technische Kennzeichnungen brauchen besondere Aufmerksamkeit; ein plausibles Wort allein genügt dort nicht als Nachweis.
@@ -8,7 +10,7 @@ Die folgende Erweiterung ist ein Entwurf für die vorhandene eigene iPhone-App u
 
 ## 1. Konsequenz für die Aufnahmeplanung
 
-Die App sucht Textflächen und erfasst sie gezielt mit geeigneter Kamera, Fokusstellung, Belichtung und Viererfusion. Nichttextbereiche dienen weiterhin als Übersicht, geometrische Orientierung und Bildübergänge. Ihr Schärfe- oder Rauschwert allein löst keine zusätzlichen Qualitätsaufnahmen aus.
+Als späterer Ausbau sucht die App Textflächen und erfasst sie gezielt mit geeigneter Kamera, Fokusstellung und Belichtung. Rauschfusion kann nach einem Vergleichstest optional hinzukommen. Nichttextbereiche dienen weiterhin als Übersicht, geometrische Orientierung und Bildübergänge. Ihr Schärfe- oder Rauschwert allein löst keine zusätzlichen Qualitätsaufnahmen aus.
 
 Zusätzliche Aufnahmen werden nach dem erwarteten Gewinn an lesbaren Textdetails priorisiert. Ein gutes Übersichtsbild genügt für andere Flächen, soweit sie die Orientierung und das Zusammensetzen ermöglichen.
 
@@ -56,7 +58,7 @@ Der Planer wählt eine strukturierte Stelle innerhalb der Textregion und löst d
 | Bewegung oder schlechte Ausrichtung | Gruppe prüfen, Referenz wählen oder neu aufnehmen |
 | Keine Verbesserung oder unsichere Bewertung | Begrenzte Versuche, Restproblem dokumentieren |
 
-Vier Wiederholungen je ausgewählter finaler Kamera-/Fokus-/Belichtungsgruppe bleiben Standard. Suchvorschauen und Diagnoseansichten werden davon getrennt betrachtet. Bei Displays beziehungsweise wechselndem Inhalt ist zu prüfen, ob die Frames überhaupt zusammenpassen.
+Eine Aufnahme pro Position ist der aktuelle Standard. Wiederholungsgruppen sind optional und erst nach einem Vergleichstest zu aktivieren. Suchvorschauen und Diagnoseansichten werden davon getrennt betrachtet. Bei Displays beziehungsweise wechselndem Inhalt ist zu prüfen, ob die Frames überhaupt zusammenpassen.
 
 ## 5. OCR-Vertrauen ergänzt die optische Prüfung
 
@@ -67,7 +69,7 @@ Die Qualitätsbewertung kombiniert deshalb:
 - erhaltene Textstriche und lokale Schärfe bei einheitlicher Vergleichsskalierung;
 - ausreichende reale Zeichengröße im Bild;
 - Belichtung und fehlende beziehungsweise abgeschnittene Zeichen;
-- verlässliche Bildausrichtung und geeignete Beiträge der Viererfusion;
+- verlässliche Bildausrichtung und, falls aktiviert, geeignete Beiträge einer optionalen Rauschfusion;
 - OCR-Ergebnis und dessen Verlässlichkeit als ergänzende Hinweise.
 
 Für technische Kennzeichnungen, Zahlen und ungewöhnliche Wörter werden Varianten mit und ohne Sprachkorrektur verglichen. Ein plausibel korrigiertes Wort kann einzelne schlecht abgebildete Zeichen verdecken. Häufig verwechselte Zeichen wie O/0, I/l/1 oder B/8 gehören in die Vergleichsaufnahmen.

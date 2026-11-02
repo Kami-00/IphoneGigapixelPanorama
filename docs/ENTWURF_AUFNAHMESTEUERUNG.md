@@ -1,12 +1,14 @@
 # Entwurf: Aufnahmeplanung und zuverlässige Sitzungen
 
+**Aktuelle Priorität:** Zuerst ein einfacher 360°-Durchlauf aus 3×-Einzelbildern, genau ein Bild pro Position. Entrauschen ist optional und zunächst ausgeschaltet. Die nachfolgenden weiterführenden Verfahren sind spätere Ausbaustufen; maßgeblich sind [README](../README.md) und [Arbeitsplan](WEITERARBEITEN.md).
+
 Stand: 2. November 2026. Weiterführung von [KONZEPT.md](KONZEPT.md) und [IDEEN_CLAUDE.md](IDEEN_CLAUDE.md). Die folgenden Entscheidungen sind Vorschläge für den Ausbau der vorhandenen Mac-Software und eigenen iPhone-App. Sie sind nicht implementiert oder am Gerät geprüft.
 
 ## 1. Zuerst fehlende Qualität bestimmen, dann eine Aufnahmegruppe wählen
 
 Eine starre Kombination aller Kameras, Fokusstellungen, Belichtungen und Wiederholungen erzeugt viele Bilder, die keine zusätzlichen Details beitragen. Der nächste Ausbau sollte deshalb Aufnahmegruppen gezielt auswählen.
 
-**Vier Wiederholungen je Ergebnisbild bleiben zunächst der gewünschte Standard.** Die erste Optimierung reduziert unnötige Fokus-/Belichtungskombinationen. Ein optionaler Abbruch nach einem oder zwei Bildern wäre eine spätere, gesondert zu prüfende Erweiterung.
+**Aktueller Standard ist eine Aufnahme pro Position.** Wiederholungsgruppen und Rauschfusion sind optionale spätere Vergleichsverfahren. Die folgenden Überlegungen zu mehreren Frames gelten nur, wenn eine solche Option bewusst aktiviert wird.
 
 Für jeden Bildbereich werden mehrere Fragen getrennt beantwortet:
 
@@ -144,7 +146,7 @@ Für die Wartezeit ist neben Bewegung auch die aktive Kamera wichtig. Dieselbe k
 
 Die Dauer langer Läufe wird aus gemessenen Aufnahme-, Wechsel-, Bewegungs-, Rechen- und Übertragungszeiten geschätzt. Eine feste Stundenangabe allein aus der Zahl der Auslösungen wäre nicht belastbar.
 
-## 9. Kleine Versuche mit getrennten Fragen
+## 9. Spätere Vergleichsversuche mit getrennten Fragen
 
 Die folgenden Versuche sind geplant und noch nicht durchgeführt.
 
@@ -190,11 +192,12 @@ Die Zahlen in IDEEN_CLAUDE.md sind Szenarien, keine gemessenen Gerätegrenzen. D
 ## 11. Empfohlene Reihenfolge
 
 1. Bestehenden Mac-/iPhone-Code einsehen und den aktuellen Ablauf reproduzieren.
-2. Aufnahmeidentitäten, Zustände, sichere Speicherung und Wiederaufnahme ergänzen.
-3. Eine feste Kamera mit Viererfusion und nachvollziehbarer Pixelgeometrie vergleichen.
-4. Den regionalen Aufnahmeplaner auf einer kleinen Kontrollmenge offline prüfen.
-5. Tele-Raster, Brückenbilder und Live-Abdeckung zusammenführen.
-6. Erst anschließend mehr Verarbeitung aufs iPhone und tiefengestützte Parallaxekorrektur bewerten.
+2. Einen 360°-Ring aus überlappenden 3×-Einzelbildern aufnehmen und am Mac zusammensetzen; Schließnaht prüfen.
+3. Danach Aufnahmeidentitäten, Zustände, sichere Speicherung und Wiederaufnahme weiter ausbauen.
+4. Optional Einzelbilder mit Rauschfusion und nachvollziehbarer Pixelgeometrie vergleichen.
+5. Den regionalen Text-/Aufnahmeplaner auf einer kleinen Kontrollmenge offline prüfen.
+6. Tele-Raster, Brückenbilder und Live-Abdeckung ausbauen.
+7. Weitere iPhone-Verarbeitung und tiefengestützte Parallaxekorrektur erst nach den jeweiligen Vergleichstests bewerten.
 
 Die Rechenteile aus tiefenpano sind eine mögliche Ausgangsbasis. Vor Übernahme müssen insbesondere Tele-/48-MP-Kameraprofile, unbekannte Tiefe, Kalibrierannahmen und tatsächliche Fokus-Rückmeldungen geprüft werden. Vorhandene Tests belegen ohne aktuellen Lauf keinen erfolgreichen Stand und ersetzen keine Hardwareprüfung.
 

@@ -1,79 +1,69 @@
 # iPhoneGigapixelPanorama
 
-Mac-gesteuerte iPhone-Fotografie zur möglichst vollständig lesbaren Erfassung von Schildern, Etiketten und Gerätebeschriftungen in hochauflösenden Panoramen. Geplante Bausteine sind OCR, LiDAR, adaptive Fokus- und Belichtungsreihen, Rauschreduzierung und 3×-Detailaufnahmen.
+Mac-gesteuerte iPhone-Panoramen. **Der erste Meilenstein ist eine funktionierende 360°-Ansicht aus 3×-Einzelaufnahmen: genau ein Bild pro Position.** Entrauschen ist optional und wird erst später anhand echter Vergleichsaufnahmen bewertet.
 
-## Primäres Qualitätsziel: Text muss scharf sein
+## Jetzt zuerst: ein einfacher 360°-Durchlauf
 
-Schilder, Etiketten und Gerätebeschriftungen haben Vorrang. OCR soll Textregionen finden und gezielte Folgeaufnahmen steuern. Entscheidend sind sichtbare, scharfe und passend belichtete Zeichen, einschließlich Zahlen und technischer Kennzeichnungen. Andere Bildbereiche dienen vor allem als Übersicht und zum Zusammensetzen; ihre Qualität allein löst keine zusätzlichen Fokus-/HDR-Aufnahmen aus.
+1. Die vorhandene Mac-Software und eigene iPhone-App verwenden.
+2. Die echte 3×-Telekamera des iPhone 14 Pro Max nutzen und die tatsächlich gelieferten Bilder prüfen.
+3. Ein überlappendes Raster für einen vollständigen Umlauf planen.
+4. Jede Position anfahren, Stillstand abwarten und im regulären Ablauf genau einmal auslösen.
+5. Jedes Quellbild mit Position und Winkeldaten vollständig am Mac speichern.
+6. Die Bilder am Mac zu einer durchgehenden 360°-Ansicht zusammensetzen und die Schließnaht zwischen letztem und erstem Bild prüfen.
 
-Der [Entwurf zur Textpriorität](docs/TEXT_PRIORITAET.md) beschreibt Textsuche, Autofokus auf Textflächen und die erneute Prüfung im fertigen Panorama. Bereits unscharfe oder kleine Schrift darf bei der Suche nicht verloren gehen; OCR-Vertrauen allein beweist keine optische Schärfe.
+Als kleinster erster Nachweis ist zunächst ein **horizontaler 360°-Ring auf einer Höhe** vorgesehen. Das ist keine Zusage einer vollständigen 360°×180°-Kugel. Weitere Höhenreihen können danach ergänzt werden.
+
+Schrittweite und Bildzahl werden aus tatsächlichem Bildwinkel, Geräteorientierung und ausreichender Überlappung bestimmt. Ein Bild pro Position bedeutet eine Kameraauslösung und ein primäres Quellbild; Fehlerwiederholungen werden gesondert protokolliert.
+
+## Abnahme des ersten Meilensteins
+
+- Die Aufnahmen stammen nachweislich von der 3×-Telekamera, nicht lediglich von einem digitalen Hauptkamera-Ausschnitt.
+- Der Umlauf deckt 360° ab; auch die letzte und erste Aufnahme überlappen.
+- Alle geplanten Quellbilder sind vollständig am Mac vorhanden.
+- Das Panorama lässt sich ohne Abdeckungslücke rundum betrachten.
+- Horizont, Bildübergänge, Doppelkonturen und Schließnaht sind geprüft; verbleibende Fehler sind dokumentiert.
+- Anzahl der Bilder, Aufnahmezeit, Fotoformat und Ergebnisabmessungen sind festgehalten.
+
+Es gibt zunächst keine feste Gigapixel-Zielgröße. Das vorhandene funktionierende Fotoformat wird verwendet; ProRAW ist keine zusätzliche Voraussetzung für diesen ersten Nachweis.
 
 ## Ausgangspunkt
 
 Nach Angaben des Projektinhabers existiert bereits eine Lösung aus **Mac-Software und eigener iPhone-App**, die den DJI Osmo Mobile 3 steuert, die iPhone-Kamera auslöst, alle Bilder auf dem Mac speichert und dort verarbeitet. Die Winkeldaten des iPhone werden ebenfalls bereits abgefragt.
 
-Der vorhandene Quellcode liegt derzeit auf dem Mac und wurde für dieses Repository noch nicht eingesehen. Dieses Repository enthält zunächst **Konzept, Forschungsgrundlagen und einen Arbeitsplan**. Es enthält noch keine lauffähige Kamera-App oder implementierten neuen Funktionen.
+Der vorhandene Quellcode liegt derzeit auf dem Mac und wurde für dieses Repository noch nicht eingesehen. Dieses Repository enthält zunächst **Konzept, Forschungsgrundlagen und einen Arbeitsplan**. Ein erfolgreicher neuer 3×-360°-Lauf wurde hier noch nicht nachgewiesen.
 
 ## Zielhardware
 
-- iPhone 14 Pro Max mit LiDAR
-- Hauptkamera: 1×, bis zu 48 MP Apple ProRAW
-- Eigene Telekamera: 3×, 12 MP
+- iPhone 14 Pro Max mit eigener 3×-Telekamera und 12 MP
 - DJI Osmo Mobile 3 mit bereits vorhandener Steuerung
-- Mac für Aufnahmeplanung, Bildspeicherung und globale Verarbeitung
+- Mac für Steuerung, Bildspeicherung und Panorama-Verarbeitung
 
-Unterstützte Kombinationen aus Kamera, Auflösung, Fokussteuerung und Ausgabeformat werden am Gerät abgefragt und überprüft. Der Projektname beschreibt das Ziel großer Detailpanoramen; ein Gigapixel-Ergebnis wurde noch nicht nachgewiesen.
+Vorhandene Autofokus- und Belichtungsfunktionen dürfen verwendet werden. Neue adaptive Fokus-, OCR-, LiDAR- oder HDR-Verfahren sind keine Voraussetzung für den ersten Durchlauf.
 
-## Geplante Erweiterungen
+## Spätere Ausbaustufen
 
-1. **Adaptive Fokus- und Belichtungsmesspunkte:** Gefundene oder vermutete Textregionen auswerten, fehlende Zeichendetails lokalisieren, gezielt neu fokussieren beziehungsweise belichten und die Verbesserung prüfen. Fokus und Belichtung werden getrennt gesteuert.
-2. **LiDAR als Planungshilfe:** Relevante Entfernungen gruppieren und unnötige Fokusaufnahmen vermeiden. Die tatsächliche Bildschärfe bleibt das entscheidende Prüfkriterium.
-3. **Vierer-Rauschfusion auf dem iPhone:** Pro Kamera, Fokusstellung und Belichtung vier Aufnahmen ausrichten und robust zusammenführen. Bewegte Bereiche gesondert behandeln.
-4. **HDR für große Helligkeitsunterschiede:** Beispielsweise Innenraum und helle Außenansicht durch ein Fenster mit mehreren Aufnahmen erfassen.
-5. **1×-Übersicht mit 3×-Detailraster:** Die Übersicht dient als geometrisches und farbliches Gerüst. Überlappende Telebilder ergänzen die feinen Details auf einem entsprechend höher aufgelösten Zielraster.
-6. **Aufgaben zwischen iPhone und Mac verteilen:** Zunächst lokale Viererfusion und Qualitätsanalyse auf dem iPhone; HDR, Fokusfusion, globale Panoramaausrichtung und abschließende Tonwertdarstellung auf dem Mac. Weitere Verlagerungen folgen erst nach Vergleichsmessungen.
+- **Textlesbarkeit:** Schilder, Etiketten und Gerätebeschriftungen bleiben das langfristige Qualitätsziel. OCR kann später Textstellen finden und gezielte Folgeaufnahmen steuern.
+- **Optionales Entrauschen:** Zunächst ausgeschaltet. Einzelbilder mit späteren Zwei-/Vierer- oder anderen Wiederholungsgruppen vergleichen; Detailerhalt, Bewegung, Zeit und Datenmenge messen. Vier Bilder sind kein vorgeschriebener Standard mehr.
+- **Fokus und HDR:** Bei Bedarf zusätzliche Fokus- oder Belichtungsaufnahmen für Textdetails ergänzen.
+- **LiDAR:** Tiefen als Planungshilfe einsetzen und ihre Zuordnung zu Telebildern prüfen.
+- **1×-Übersicht und 3×-Details:** Eine Referenzansicht kann die Zuordnung von Telebildern unterstützen.
+- **Weitere iPhone-Verarbeitung:** Erst nach Vergleich mit der bestehenden Mac-Pipeline über eine Verlagerung von Rechenarbeit entscheiden.
 
-## Vorgeschlagener Aufnahmeablauf
-
-~~~text
-1×-Übersicht oder Übersichtspanorama
-    ↓
-Panorama-Raster anhand der Übersicht und Winkeldaten planen
-    ↓
-Gimbalposition anfahren und Stillstand bestätigen
-    ↓
-LiDAR + zugehöriges Hauptkamerabild erfassen
-    ↓
-Benötigte Kamera-, Fokus- und Belichtungsgruppen auswählen
-    ↓
-Je Gruppe vier Wiederholungen aufnehmen und lokal entrauschen
-    ↓
-Detailgewinn prüfen, nötigenfalls gezielt ergänzen
-    ↓
-Nächste Position; anschließend globale Verarbeitung am Mac
-~~~
-
-Dieser Ablauf ist ein Entwurf und muss an den vorhandenen Code angepasst werden. Nicht jede Kachel braucht dieselbe Zahl an Fokuslagen, Belichtungen oder Wiederholungen.
-
-## Technische Eckpunkte
-
-- Die LiDAR-Tiefe gehört zunächst zur Hauptkameraperspektive. Für Telebilder sind Kamerageometrie, unterschiedliche Sichtbarkeit und Bildregistrierung zu berücksichtigen.
-- ProRAW liefert laut Apple keine angehängte Fototiefenkarte. Separate Tiefenerfassung ist die vorgesehene Ausgangslösung.
-- Eine Linsenposition ist kein universelles Entfernungsmaß. Autofokus auf ausgewählte Regionen und eine anschließende Schärfeprüfung sind ein praktikabler Einstieg.
-- Bei 48-MP-ProRAW sind streng vorgegebene manuelle ISO-/Zeitwerte nicht pauschal garantiert. Die tatsächlichen Aufnahmeergebnisse müssen geprüft werden.
-- Auch auf einem ruhenden Gimbal müssen Fokus- und Wiederholungsaufnahmen aufeinander ausgerichtet werden.
-- Eine selbst berechnete Fusion ist ein neues Zwischenbild. Original-DNGs werden während der Entwicklung zusätzlich erhalten.
+Die Forschungsdokumente beschreiben diese späteren Möglichkeiten. Bei unterschiedlicher Priorisierung gilt der hier festgehaltene erste Meilenstein.
 
 ## Am Mac weiterarbeiten
 
-1. Dieses Repository klonen.
-2. Den bestehenden Mac-/iPhone-Code sichern und gezielt in das Repository übernehmen.
-3. Den bisherigen Ablauf reproduzieren und dokumentieren.
-4. Die Erweiterungen nach dem [Arbeitsplan](docs/WEITERARBEITEN.md) einzeln prüfen.
+1. Vorhandenen Mac-/iPhone-Code sichern und gezielt in das Repository übernehmen.
+2. Den bisherigen Ablauf reproduzieren.
+3. Den [Arbeitsplan](docs/WEITERARBEITEN.md) für den einfachen 3×-360°-Lauf abarbeiten.
 
-Das [technische Konzept](docs/KONZEPT.md) beschreibt Aufnahmeplanung, Aufgabenverteilung und Grenzen. Die [Quellen](docs/QUELLEN.md) trennen dokumentierte APIs, Forschung und noch zu prüfende Ableitungen. Weitere ungeprüfte Vorschläge, etwa zu Parallaxe am Gimbal und zum Gigapixel-Nachweis, sammelt [IDEEN_CLAUDE.md](docs/IDEEN_CLAUDE.md).
+Weitere Unterlagen:
 
-Der [Entwurf zur Aufnahmesteuerung](docs/ENTWURF_AUFNAHMESTEUERUNG.md) konkretisiert die adaptive Auswahl von Aufnahmegruppen, die Geometrie lokaler Viererfusionen und die zuverlässige Wiederaufnahme langer Sitzungen. Er enthält kleine Vergleichsversuche und präzisiert die bisherigen Auflösungs- und Parallaxerechnungen.
+- [Technisches Konzept](docs/KONZEPT.md)
+- [Aufnahmesteuerung und zuverlässige Sitzungen](docs/ENTWURF_AUFNAHMESTEUERUNG.md)
+- [Späterer Ausbau: Textpriorität und OCR](docs/TEXT_PRIORITAET.md)
+- [Ideen von Claude](docs/IDEEN_CLAUDE.md)
+- [Forschungsquellen](docs/QUELLEN.md)
 
 ## Status und Lizenz
 

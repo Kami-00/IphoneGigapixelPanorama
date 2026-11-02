@@ -1,5 +1,7 @@
 # Technisches Konzept
 
+**Aktuelle Priorität:** Zuerst ein einfacher 360°-Durchlauf aus 3×-Einzelbildern, genau ein Bild pro Position. Entrauschen ist optional und zunächst ausgeschaltet. Die nachfolgenden weiterführenden Verfahren sind spätere Ausbaustufen; maßgeblich sind [README](../README.md) und [Arbeitsplan](WEITERARBEITEN.md).
+
 ## 1. Bestehende Lösung als Grundlage
 
 Bereits vorhanden laut Projektinhaber: Mac-Steuerung des DJI Osmo Mobile 3, eigene iPhone-App, Kameraauslösung, Speicherung aller Bilder auf dem Mac, Verarbeitung am Mac und Abfrage der iPhone-Winkeldaten. Welche Fokus-, HDR- oder Rauschverfahren die aktuelle Verarbeitung bereits enthält, ist noch unbekannt.
@@ -14,7 +16,7 @@ Eine Aufnahme erhält eine eindeutige Zuordnung zu:
 - Physischer Kamera und tatsächlichem Bildformat
 - Fokusstellung beziehungsweise Autofokus-Zielregion
 - Belichtungsgruppe
-- Wiederholungsnummer innerhalb der Gruppe, zunächst vier
+- Wiederholungsnummer innerhalb der Gruppe; im ersten 360°-Lauf eine Aufnahme pro Position, Wiederholungsgruppen nur als späterer optionaler Vergleich
 
 Zusätzlich speichern: Zeitstempel, Orientierung mit Bezugssystem, verfügbare Bewegungsdaten, angeforderte und tatsächlich gemeldete Belichtungswerte, Bildabmessungen, verfügbare Kalibrierdaten und Qualitätsbewertungen. Verfügbarkeit und Bedeutung der Metadaten werden im bestehenden Aufnahmeweg geprüft.
 
@@ -64,7 +66,7 @@ Für den ersten Prototyp genügt eine konservative Zuordnung großer Tiefenregio
 
 ## 5. Verarbeitung auf dem iPhone
 
-Erster Ausbau: vier Bilder mit derselben Kamera, Fokusstellung und Belichtung aufnehmen, registrieren und robust entrauschen. Bewegte oder schlecht ausgerichtete Bereiche dürfen nicht blind gemittelt werden. Qualitätswerte, kleine Vorschauen und Masken unterstützen schnelle Folgeentscheidungen.
+Optionaler späterer Vergleich: mehrere Bilder mit derselben Kamera, Fokusstellung und Belichtung aufnehmen, registrieren und robust entrauschen. Im ersten 360°-Lauf wird ein Einzelbild pro Position verwendet. Bewegte oder schlecht ausgerichtete Bereiche dürfen nicht blind gemittelt werden. Qualitätswerte, kleine Vorschauen und Masken unterstützen schnelle Folgeentscheidungen.
 
 Core Image, Metal und Accelerate bieten dafür Bausteine; eine fertige Viererfusion oder gemessene Geschwindigkeit wird nicht vorausgesetzt.
 
@@ -79,7 +81,7 @@ Eigene Beispielrechnung für vollständig entwickelte RGBA16F-Puffer, keine Mess
 
 Decoder, Ausgabe, Bildpyramiden und Ausrichtungsdaten kommen hinzu. Deshalb sequenzielle oder kachelweise Verarbeitung, Wiederverwendung von Puffern und begrenzte Warteschlangen vorsehen. Aufnahmegeschwindigkeit, Speicher und Wärmeentwicklung am Gerät messen.
 
-Viererfusion erhöht zunächst die Bildqualität bei gleicher Pixelzahl. Eine zusätzliche Super-Resolution-Auswertung kleiner Verschiebungen wäre ein eigenes Verfahren.
+Rauschfusion soll die Bildqualität bei gleicher Pixelzahl verbessern; ihr tatsächlicher Nutzen ist erst zu messen. Eine zusätzliche Super-Resolution-Auswertung kleiner Verschiebungen wäre ein eigenes Verfahren.
 
 Das Ergebnis wird als neues, möglichst lineares Zwischenbild mit ausreichender Farbtiefe und dokumentierten Metadaten gespeichert. Es ist nicht automatisch wieder eine originale Apple-ProRAW-Datei. Original-DNGs zunächst erhalten. Weniger Dateien garantieren keine proportional kleinere Datenmenge; Ausgabeformat und Kompression sind mitzubeurteilen.
 
