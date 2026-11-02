@@ -1,0 +1,39 @@
+Osmo Studio – Aufnahme mit iPhone 14 Pro Max und DJI OM3
+
+Start: Osmo Studio.app öffnen. Osmo Camera auf dem iPhone öffnen und verbinden.
+Beide Geräte im gleichen WLAN; iPhone entsperrt lassen. Kein Kabel nötig.
+Hochformat, Hauptkamera 1×. Griff aufrecht und freie Bewegungsfläche.
+
+1. OM3 verbinden.
+2. Aktuelle Sensordaten und „48 MP Apple ProRAW“ abwarten.
+3. Einzelbild oder automatische Reihe starten.
+
+Fokusreihe: mehrere feste Linsenpositionen von nah bis fern; eine Position benutzt Autofokus.
+Panorama: horizontale Schwenks und optional eine Reihe darüber/darunter. Standard: ein Foto je Richtung, keine Fokus-Wiederholungen. „Letztes Panorama berechnen“ verarbeitet die letzte Panorama-Reihe nachträglich.
+Wiederholungen liefern zusätzliches Material fürs spätere Stacking.
+Panorama-Reihen werden nach der Aufnahme automatisch entwickelt und als Panorama.jpg zusammengesetzt. Fokusreihen werden noch nicht gestackt. Nur tatsächlich überlappende Ansichten werden verbunden. Ein fertiges Teilpanorama ist kein vollständiges 360°-Kugelbild.
+
+Alle Originale liegen in photos, automatische Reihen jeweils in einem eigenen Ordner.
+Jedes DNG hat eine JSON-Datei mit Fokus, Belichtung, tatsächlicher Orientierung und Sensordaten um den Auslösezeitpunkt.
+Originale bleiben zusätzlich auf dem iPhone unter Dateien → Osmo Camera → Aufnahmen.
+Speicher auf BEIDEN Geräten beachten; die Anzeige am Mac plant mit 130 MB je Bild.
+STOPP beendet die Reihe. Ein bereits ausgelöstes Foto wird noch übertragen.
+
+Genauigkeit: Richtung relativ zum Reihenbeginn, kein Kompass. Zielabweichung bis 1°.
+Die Mechanik kann nicht frei 360° drehen; für einen Vollkreis sind mehrere Grundstellungen nötig.
+Bei veralteten Sensordaten, fehlender Motorreaktion oder nicht erreichbaren Winkeln hält die Automatik an.
+Rollkorrektur ist beim vorhandenen OM3 noch nicht nachgewiesen: der Testbefehl zeigte keine messbare Reaktion.
+Die automatische Aufnahme toleriert bis zu 5° Neigung; die geometrische Ausrichtung erfolgt beim Zusammenfügen. Mehr als 5° bitte an der Halterung korrigieren. Der separate Motor-Test kann bei fehlender Roll-Reaktion weiterhin abbrechen.
+Sie schreibt keine künstlich gerade gerechneten Pixel in die RAW-Dateien.
+
+Zwei Durchgänge: Panorama aktivieren, dann „Zwei Durchgänge mit manueller 180°-Drehung“.
+Vor Start den Gimbal zentrieren. Standard: 6 Blickrichtungen je Durchgang, 12 RAWs insgesamt.
+Nach Durchgang 1 dreht die App zur Startblickrichtung zurück und wartet.
+Dann Griff am selben Kamerastandort um 180° drehen, iPhone-App geöffnet lassen und „Gedreht – Durchgang 2 starten“ wählen.
+Die App prüft die Drehung mit dem unveränderten Sensorbezug.
+Erst nach Durchgang 2 werden beide Reihen zusammen verarbeitet. Direkt oben/unten fehlen bei einer waagerechten Reihe Bilder.
+Diese Zweipass-Funktion wurde bisher mit simulierten Übergängen geprüft; ein kompletter echter Zweipass-Lauf steht noch aus.
+
+Maximale Auflösung: RAW-Entwicklung in voller Originalgröße als PNG. Keine Verkleinerung vor dem Zusammenfügen und keine Megapixelgrenze für das fertige Panorama. Nur die Suche nach Bildübereinstimmungen verwendet kleinere Arbeitsansichten. Ausgabe: Panorama.png (verlustfrei komprimiert, 8-Bit-sRGB) und Panorama.jpg (höchste JPEG-Qualität). Die DNGs behalten die vollständigen RAW-Daten.
+
+Detailschonendes Zusammenfügen: Kubische Projektion in voller Auflösung, Nahtsuche mit 1-MP-Arbeitsansichten und schmale Übergänge mit zwei Frequenzbändern. Keine zusätzliche Nachschärfung. Dadurch werden weniger abweichende Bilddetails miteinander vermischt.

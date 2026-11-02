@@ -3,9 +3,9 @@
 ## 1. Vorhandenen Stand übernehmen
 
 - [ ] Den bestehenden Projektordner sichern.
-- [ ] Mac-Software und eigene iPhone-App gezielt in dieses Repository übernehmen.
-- [ ] Sprachen, Frameworks, Build-/Startbefehle und unterstützte Betriebssysteme dokumentieren.
-- [ ] Gimbalprotokoll, Kameraauslösung, Bildübertragung und vorhandene Bildverarbeitung beschreiben.
+- [x] Mac-Software und eigene iPhone-App gezielt in dieses Repository übernehmen.
+- [x] Sprachen, Frameworks und Build-/Startbefehle in IMPLEMENTIERUNGSSTAND.md dokumentieren.
+- [x] Gimbalprotokoll, Kameraauslösung, Bildübertragung und vorhandene Bildverarbeitung beschreiben.
 - [ ] Einen bisherigen Aufnahme-/Verarbeitungslauf als reproduzierbare Referenz erfassen.
 
 ## 2. Erster Nachweis: 360° aus 3×-Einzelbildern

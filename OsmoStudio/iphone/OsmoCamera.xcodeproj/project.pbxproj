@@ -1,0 +1,20 @@
+// !$*UTF8*$!
+{ archiveVersion = 1; classes = {}; objectVersion = 56; objects = {
+000000000000000000000004 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OsmoCamera.swift; sourceTree = "<group>"; };
+000000000000000000000005 = { isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+000000000000000000000006 = { isa = PBXFileReference; explicitFileType = wrapper.application; path = "Osmo Camera.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+000000000000000000000007 = { isa = PBXBuildFile; fileRef = 000000000000000000000004; };
+000000000000000000000002 = { isa = PBXGroup; children = (000000000000000000000004,000000000000000000000005,000000000000000000000003); sourceTree = "<group>"; };
+000000000000000000000003 = { isa = PBXGroup; children = (000000000000000000000006); name = Products; sourceTree = "<group>"; };
+000000000000000000000008 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (000000000000000000000007); runOnlyForDeploymentPostprocessing = 0; };
+000000000000000000000009 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+00000000000000000000000A = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+00000000000000000000000B = { isa = PBXNativeTarget; buildConfigurationList = 00000000000000000000000D; buildPhases = (000000000000000000000008,000000000000000000000009,00000000000000000000000A); buildRules = (); dependencies = (); name = OsmoCamera; productName = "Osmo Camera"; productReference = 000000000000000000000006; productType = "com.apple.product-type.application"; };
+000000000000000000000001 = { isa = PBXProject; attributes = { LastUpgradeCheck = 1600; }; buildConfigurationList = 00000000000000000000000C; compatibilityVersion = "Xcode 14.0"; developmentRegion = de; hasScannedForEncodings = 0; knownRegions = (de,en,Base); mainGroup = 000000000000000000000002; productRefGroup = 000000000000000000000003; projectDirPath = ""; projectRoot = ""; targets = (00000000000000000000000B); };
+00000000000000000000000C = { isa = XCConfigurationList; buildConfigurations = (00000000000000000000000E,00000000000000000000000F); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+00000000000000000000000E = { isa = XCBuildConfiguration; buildSettings = { SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SWIFT_VERSION = 5.0; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };
+00000000000000000000000F = { isa = XCBuildConfiguration; buildSettings = { SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SWIFT_VERSION = 5.0; CLANG_ENABLE_MODULES = YES; }; name = Release; };
+00000000000000000000000D = { isa = XCConfigurationList; buildConfigurations = (000000000000000000000010,000000000000000000000011); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+000000000000000000000010 = { isa = XCBuildConfiguration; buildSettings = { SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SWIFT_VERSION = 5.0; CLANG_ENABLE_MODULES = YES; PRODUCT_BUNDLE_IDENTIFIER = de.8e4.osmocamera; PRODUCT_NAME = "Osmo Camera"; INFOPLIST_FILE = Info.plist; CODE_SIGN_STYLE = Automatic; DEVELOPMENT_TEAM = ""; TARGETED_DEVICE_FAMILY = 1; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };
+000000000000000000000011 = { isa = XCBuildConfiguration; buildSettings = { SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SWIFT_VERSION = 5.0; CLANG_ENABLE_MODULES = YES; PRODUCT_BUNDLE_IDENTIFIER = de.8e4.osmocamera; PRODUCT_NAME = "Osmo Camera"; INFOPLIST_FILE = Info.plist; CODE_SIGN_STYLE = Automatic; DEVELOPMENT_TEAM = ""; TARGETED_DEVICE_FAMILY = 1; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; }; name = Release; };
+}; rootObject = 000000000000000000000001; }

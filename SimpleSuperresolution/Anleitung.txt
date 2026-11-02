@@ -1,0 +1,24 @@
+SUPERRESOLUTION – EINFACHER LOKALER STACK
+
+Start: Superresolution.app doppelklicken.
+1. „Bilder auswählen“: zusammengehörende JPEG-, HEIC-, PNG- oder TIFF-Fotos wählen.
+2. „Berechnen“ anklicken.
+3. „Vergleich öffnen“ oder „Ergebnisordner“ anklicken.
+
+Die App bleibt zusammen mit stack.py und tools in diesem Ordner. Sie verwendet die auf diesem Mac vorhandene Python-Umgebung und ImageMagick aus Homebrew. Kein Upload, keine Änderung der Originale. Ergebnisordner liegen hier unter „Ergebnisse“. Abbrechen beendet die Verarbeitung; temporäre Bilder werden danach entfernt.
+
+Ergebnisse: Einzelbild.png, Mittelwert.png und Median.png, jeweils auch als JPEG; Vergleich.html und Detailvergleiche. Die erste ausgewählte Datei ist die Referenz. Falls sie unscharf ist, andere Bilder auswählen bzw. die Referenz über den Kommandozeilenaufruf als erstes Argument angeben.
+
+Verarbeitung: ImageMagick vergrößert zuerst auf 200 Prozent je Achse, dann richtet Hugin align_image_stack die Bilder aus (inklusive kleiner Maßstabsunterschiede). Anschließend werden gleichgewichteter Mittelwert und Median in RGB berechnet. Die Rechenoperation erfolgt speichersparend in Streifen mit NumPy, statt sämtliche großen Bilder gleichzeitig in ImageMagick zu halten. Keine lokale Verformung, Helligkeitsanpassung oder Nachschärfung. Gemeinsame Bildfläche wird beschnitten. HEIC wird zu 8-Bit-sRGB dekodiert; keine RAW-/HDR-Ausgabe.
+
+Vorbild: Isaac Ullahs SR.sh, 2017:
+https://isaacullah.github.io/Script-for-creating-superresoultion-images-from-handheld-shots/
+Der ursprüngliche Code-Link ist nicht mehr verfügbar. Dies ist eine eigene Umsetzung desselben Grundablaufs, keine bytegleiche Wiederherstellung. Verwandter Referenzcode: https://github.com/luator/sr_stack (Felix Widmaier, MIT).
+Hugin Mac-Build 2024.0.1: https://github.com/dannephoto/hugin/releases
+ImageMagick: https://imagemagick.org
+
+Vierfache Pixelzahl bedeutet doppelte Breite und Höhe; sie garantiert nicht viermal so viel echte Bildinformation. Am besten 8–20 unmittelbar nacheinander aufgenommene, scharfe Bilder derselben Ansicht, bei konstantem Fokus und Licht und nur minimaler Bewegung. Unterschiedliche Fokuspunkte können beim Mittelwert Details verwischen. Der Median kann Ausreißer reduzieren, liefert aber nicht automatisch mehr echte Auflösung. Die Funktion ist kein Fokus-Stacking.
+
+Getestet: drei Regalbilder vom 31.10.2026, Ansicht 9. Unterschiedlicher Fokus/Belichtung in der dritten Aufnahme. 37 Sekunden, 6008 × 8029 Pixel. Detailvergleich zeigt weniger unruhige Flächen, aber keinen eindeutigen Schärfegewinn gegenüber dem besten Einzelbild. Der frühere Stack wurde für die Vergleichsausschnitte einmal zusätzlich bikubisch auf die neue Referenz ausgerichtet; dies kann ihn etwas weicher darstellen.
+
+Zwischendateien werden standardmäßig entfernt. Ausrichtung.pto und Verarbeitung.log dokumentieren den Lauf; ihre temporären Bildpfade existieren anschließend nicht mehr. Mit --keep-work lassen sich alle Arbeitsdateien behalten.

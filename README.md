@@ -2,6 +2,14 @@
 
 Mac-gesteuerte iPhone-Panoramen. **Der erste Meilenstein ist eine funktionierende 360°-Ansicht aus 3×-Einzelaufnahmen: genau ein Bild pro Position.** Entrauschen ist optional und wird erst später anhand echter Vergleichsaufnahmen bewertet.
 
+## Vorhandener Quellcode (Stand 02.11.2026)
+
+Der bisherige lokale Entwicklungsstand ist jetzt enthalten: **OsmoStudio** (Mac/iPhone, Gimbalsteuerung und Panorama), **SimpleSuperresolution** (Hugin-Stacking) und **FocusStack** (Fokusfusion).
+
+**[Einrichtung, Startbefehle, Datenfluss und geprüfter Stand](docs/IMPLEMENTIERUNGSSTAND.md)**
+
+Der importierte Aufnahmeweg verwendet die **1×-Hauptkamera mit 48-MP-ProRAW**. Die folgenden 3×-Ziele bleiben die nächste Entwicklungsstufe; sie sind durch den Import nicht umgesetzt.
+
 ## Jetzt zuerst: ein einfacher 360°-Durchlauf
 
 1. Die vorhandene Mac-Software und eigene iPhone-App verwenden.
@@ -30,7 +38,7 @@ Es gibt zunächst keine feste Gigapixel-Zielgröße. Das vorhandene funktioniere
 
 Nach Angaben des Projektinhabers existiert bereits eine Lösung aus **Mac-Software und eigener iPhone-App**, die den DJI Osmo Mobile 3 steuert, die iPhone-Kamera auslöst, alle Bilder auf dem Mac speichert und dort verarbeitet. Die Winkeldaten des iPhone werden ebenfalls bereits abgefragt.
 
-Der vorhandene Quellcode liegt derzeit auf dem Mac und wurde für dieses Repository noch nicht eingesehen. Dieses Repository enthält zunächst **Konzept, Forschungsgrundlagen und einen Arbeitsplan**. Ein erfolgreicher neuer 3×-360°-Lauf wurde hier noch nicht nachgewiesen.
+Der vorhandene Quellcode wurde vom Mac übernommen; Details und Grenzen sind im Implementierungsstand dokumentiert. Dieses Repository enthält zunächst **Konzept, Forschungsgrundlagen und einen Arbeitsplan**. Ein erfolgreicher neuer 3×-360°-Lauf wurde hier noch nicht nachgewiesen.
 
 ## Zielhardware
 

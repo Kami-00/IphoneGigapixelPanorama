@@ -10,7 +10,7 @@
 
 ## Bestehende Projektregeln
 
-- Dies ist zunächst ein Konzept-Repository. Bestehende Mac-Software und eigene iPhone-App wurden noch nicht eingesehen.
+- Der vorhandene lokale Quellcode wurde am 02.11.2026 übernommen. Technologiestack, Aufbau und Grenzen stehen in docs/IMPLEMENTIERUNGSSTAND.md. Der bestehende 1×-ProRAW-Aufnahmeweg ist noch kein Nachweis des geplanten 3×-Meilensteins.
 - Vorhandene Gimbalsteuerung, Kameraauslösung, Bildübertragung und Winkeldaten sind laut Projektinhaber bereits vorhanden. Darauf aufbauen; nicht ohne Codeprüfung neu entwickeln.
 - Zuerst den realen Technologiestack, Build-/Startbefehle und Datenfluss dokumentieren. Keine Sprache oder Architektur allein aus den Konzeptdokumenten ableiten.
 - Bestätigte bestehende Funktionen, neue Implementierungen, Entwurfsvorschläge und offene Hardwarefragen klar auseinanderhalten.

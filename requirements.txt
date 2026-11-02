@@ -1,0 +1,6 @@
+numpy
+scipy
+opencv-python
+Pillow
+bleak
+pyobjc-framework-CoreBluetooth; sys_platform == 'darwin'
