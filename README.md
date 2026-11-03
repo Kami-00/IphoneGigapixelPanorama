@@ -12,8 +12,6 @@ Das Bild oben ist auf 1600 Pixel Breite verkleinert. Hier ein Ausschnitt in voll
 
 ![Hinterrad des Shelby Cobra in voller Auflösung, Schriftzug auf der Reifenflanke lesbar](docs/bilder/hotwheels-redline-ausschnitt.jpg)
 
-Das vollständige Bild liegt nicht im Repository; `Ergebnisse/` bleibt ausgeschlossen. Die beiden Bilder hier sind verkleinerte Belege, zusammen rund 330 KB.
-
 ## Vorhandener Quellcode (Stand 02.11.2026)
 
 Der bisherige lokale Entwicklungsstand ist jetzt enthalten: **OsmoStudio** (Mac/iPhone, Gimbalsteuerung und Panorama), **SimpleSuperresolution** (Hugin-Stacking) und **FocusStack** (Fokusfusion).
