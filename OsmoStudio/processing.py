@@ -21,7 +21,7 @@ def process(folder,variant='sharp',output_name='Panorama'):
   if key not in groups or score<groups[key][2]:groups[key]=(p,m,score)
  selected=list(groups.values())
  if len(selected)<2:raise ValueError('Diese Reihe enthält nur eine Blickrichtung')
- # Main camera is fixed at 24 mm equivalent; reject disconnected angular coverage.
+ # Coarse angular precheck; tele path additionally requires a connected feature graph.
  def connected(a,b):
   ma=a[1]['shutter_motion'];mb=b[1]['shutter_motion']
   yaw=abs((ma['heading']-mb['heading']+180)%360-180)
@@ -41,16 +41,27 @@ def process(folder,variant='sharp',output_name='Panorama'):
   if im is None:raise RuntimeError('Entwickeltes Bild nicht lesbar')
   # Keep every original source pixel for final composition.
   images.append(im)
- stitcher=cv.Stitcher_create(cv.Stitcher_PANORAMA)
- stitcher.setRegistrationResol(2);stitcher.setSeamEstimationResol(.2);stitcher.setCompositingResol(-1)
- status=stitcher.estimateTransform(images)
- if status==cv.Stitcher_OK and len(stitcher.component())!=len(images):raise RuntimeError('Nicht alle Blickrichtungen ließen sich verbinden')
- if status==cv.Stitcher_OK:
-  if variant=='sharp':
-   from sharp_composite import compose
-   pano=compose(images,stitcher)
-  else:status,pano=stitcher.composePanorama()
- if status!=cv.Stitcher_OK:raise RuntimeError('Bilder lassen sich nicht zuverlässig verbinden: zu wenig Überlappung oder unpassende Perspektive (Code %d)'%status)
+ if all(m.get('camera')=='tele' for _,m,_ in selected):
+  from estimate_wide import estimate
+  from sharp_composite import compose
+  scale=min(1.,math.sqrt(2_000_000/max(im.shape[0]*im.shape[1] for im in images)))
+  working=[cv.resize(im,None,fx=scale,fy=scale,interpolation=cv.INTER_AREA) for im in images]
+  cameras=estimate(working,[m for _,m,_ in selected],focal_35mm=77,require_connected=True)
+  class TeleAlignment:
+   def cameras(self):return cameras
+   def workScale(self):return scale
+  pano=compose(images,TeleAlignment())
+ else:
+  stitcher=cv.Stitcher_create(cv.Stitcher_PANORAMA)
+  stitcher.setRegistrationResol(2);stitcher.setSeamEstimationResol(.2);stitcher.setCompositingResol(-1)
+  status=stitcher.estimateTransform(images)
+  if status==cv.Stitcher_OK and len(stitcher.component())!=len(images):raise RuntimeError('Nicht alle Blickrichtungen ließen sich verbinden')
+  if status==cv.Stitcher_OK:
+   if variant=='sharp':
+    from sharp_composite import compose
+    pano=compose(images,stitcher)
+   else:status,pano=stitcher.composePanorama()
+  if status!=cv.Stitcher_OK:raise RuntimeError('Bilder lassen sich nicht zuverlässig verbinden: zu wenig Überlappung oder unpassende Perspektive (Code %d)'%status)
  # Trim only outer empty rows/columns; keep actual irregular coverage visible.
  mask=np.any(pano>0,axis=2).astype(np.uint8);x,y,w,h=cv.boundingRect(mask);pano=pano[y:y+h,x:x+w]
  # Largest rectangular interior, using a small mask, avoids black border wedges.

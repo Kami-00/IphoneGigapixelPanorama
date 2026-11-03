@@ -81,6 +81,11 @@ let project = URL(fileURLWithPath: CommandLine.arguments.count > 1 ? CommandLine
         }
         return ProcessInfo.processInfo.hostName
     }
+    func updatePairing(){
+        var c=URLComponents();c.scheme="osmostudio";c.host="connect"
+        c.queryItems=[URLQueryItem(name:"host",value:localIP()),URLQueryItem(name:"port",value:String(port)),URLQueryItem(name:"token",value:token)]
+        pairing=c.string ?? ""
+    }
     func request(_ path:String,_ body:[String:Any]?=nil) async throws->[String:Any] {
         var r=URLRequest(url:URL(string:"http://127.0.0.1:\(port)\(path)")!);r.timeoutInterval=path=="/state" ? 3 : 25;r.setValue("Bearer "+token,forHTTPHeaderField:"Authorization")
         if let body=body{r.httpMethod="POST";r.setValue("application/json",forHTTPHeaderField:"Content-Type");r.httpBody=try JSONSerialization.data(withJSONObject:body)}
@@ -89,6 +94,7 @@ let project = URL(fileURLWithPath: CommandLine.arguments.count > 1 ? CommandLine
         return obj
     }
     func refresh() async {
+        updatePairing()
         guard ready else{return}
         do {
             let s=try await request("/state")
@@ -132,7 +138,7 @@ struct Content:View {
             }
             GroupBox("3 · Foto") {VStack(alignment:.leading,spacing:12){HStack{Toggle("Manueller Fokus",isOn:$model.manualFocus);Spacer();Toggle("Belichtung für Aufnahme sperren",isOn:$model.lockExposure)}
                 if model.manualFocus{HStack{Text("Nah");Slider(value:$model.focus,in:0...1);Text("Fern");Text(String(format:"%.2f",model.focus)).monospacedDigit()};Text("Die Fokusposition wird beim Auslösen eingestellt; keine Entfernungsmessung.").font(.caption).foregroundStyle(.secondary)}
-                HStack{Button("Foto aufnehmen"){model.capture()}.buttonStyle(.borderedProminent).disabled(model.phone.isEmpty || model.busy || model.running || !model.rawReady);Button("Letztes Panorama berechnen"){model.action("/process")}.disabled(model.running || model.busy);Button("Fotoordner öffnen"){NSWorkspace.shared.open(project.appendingPathComponent("photos"))};Spacer();Text("48 MP · Apple ProRAW · DNG + Sensordaten").foregroundStyle(.secondary)}
+                HStack{Button("Foto aufnehmen"){model.capture()}.buttonStyle(.borderedProminent).disabled(model.phone.isEmpty || model.busy || model.running || !model.rawReady);Button("Letztes Panorama berechnen"){model.action("/process")}.disabled(model.running || model.busy);Button("Fotoordner öffnen"){NSWorkspace.shared.open(project.appendingPathComponent("photos"))};Spacer();Text("Apple ProRAW · DNG + Sensordaten").foregroundStyle(.secondary)}
             }.padding()}
             GroupBox("4 · Automatische Aufnahmereihe") {
                 VStack(alignment:.leading,spacing:10){
@@ -143,6 +149,11 @@ struct Content:View {
                     if model.panorama {HStack{Text("Schwenk ±\(Int(model.halfSpan))°");Slider(value:$model.halfSpan,in:10...100,step:10);Text("Oben/unten ±\(Int(model.pitchSpan))°");Slider(value:$model.pitchSpan,in:0...30,step:5)}.disabled(model.running)}
                     Text("\(model.shotCount) Fotos · ca. \(String(format:"%.1f",Double(model.shotCount)*0.13)) GB Reserve. 1 Fokusposition = Autofokus; mehrere = Nah–Fern-Reihe. Danach automatisch zusammensetzen. Teilpanorama, solange nicht der ganze Raum erfasst wurde.").font(.caption).foregroundStyle(.secondary)
                     HStack{Button("Aufnahmereihe starten"){model.sequence()}.buttonStyle(.borderedProminent).disabled(model.running || model.busy || !model.rawReady || !model.motionFresh || model.gimbal.isEmpty || model.awaitingTurn || model.shotCount>300);Button("STOPP"){model.stop()}.tint(.red);Spacer();Text("Durchgang \(model.passIndex) · \(model.done) / \(model.total) gespeichert")}
+                    HStack {
+                        Button("3×3-Panorama · echte 3×-Telekamera"){model.action("/tele-grid")}.buttonStyle(.borderedProminent).disabled(model.running || model.busy || model.phone.isEmpty || !model.motionFresh || model.gimbal.isEmpty || model.awaitingTurn)
+                        Button("Zurück zur 1×-Hauptkamera"){model.action("/camera",["camera":"wide"])}.disabled(model.running || model.busy || model.phone.isEmpty)
+                    }
+                    Text("9 Einzelbilder · ca. 25 % Überlappung · ProRAW mit 12 MP je Telefoto · automatische Panorama-Berechnung").font(.caption).foregroundStyle(.secondary)
                     Button("Großes 360°-Bild aufnehmen – fehlende Bereiche schwarz"){model.action("/wide")}.disabled(model.running || model.busy || model.awaitingTurn || !model.rawReady || !model.motionFresh || model.gimbal.isEmpty)
                     Text("Erfasst die erreichbaren Schwenk- und Höhenwinkel. Anschließend automatische 360°-Berechnung in voller Auflösung.").font(.caption).foregroundStyle(.secondary)
                     if model.running {if model.total>0{ProgressView(value:Double(model.done),total:Double(model.total))}else{ProgressView()}}

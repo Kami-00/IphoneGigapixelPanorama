@@ -60,8 +60,11 @@ def enqueue_capture(focus=-1,lock_exposure=False,context=None):
     with LOCK:
         if time.time()-PHONE['seen']>5:raise ValueError('iPhone-App ist nicht verbunden oder nicht im Vordergrund')
         if any(j['status'] in ('pending','delivered') and time.time()<j['expires'] for j in JOBS.values()):raise ValueError('Eine Aufnahme läuft bereits')
-        if not PHONE.get('proraw48'):raise ValueError('iPhone meldet kein 48-MP-ProRAW')
-        ident=uuid.uuid4().hex;JOBS[ident]={'id':ident,'kind':'capture','focus':focus,'lock_exposure':bool(lock_exposure),'status':'pending','expires':time.time()+180,'format':'proraw48','context':context or {},'folder':str(RUN_DIR or PHOTOS)}
+        tele=(context or {}).get('camera')=='tele'
+        if tele:
+            if PHONE.get('camera')!='tele' or not PHONE.get('raw_ready'):raise ValueError('3×-Telekamera nicht bereit')
+        elif not PHONE.get('proraw48'):raise ValueError('iPhone meldet kein 48-MP-ProRAW')
+        ident=uuid.uuid4().hex;JOBS[ident]={'id':ident,'kind':'capture','focus':focus,'lock_exposure':bool(lock_exposure),'status':'pending','expires':time.time()+180,'format':'proraw12tele' if tele else 'proraw48','context':context or {},'folder':str(RUN_DIR or PHOTOS)}
         return ident
 def next_job():
     with LOCK:
@@ -88,7 +91,11 @@ def store_photo(ident,data):
             if not any(k.endswith(':DNGVersion') for k in tags):raise ValueError('Keine gültige DNG-Datei')
             dims=[(int(v),int(tags.get(k.replace('ImageWidth','ImageHeight'),0))) for k,v in tags.items() if k.endswith(':ImageWidth')]
             w,h=max(dims,key=lambda d:d[0]*d[1],default=(0,0))
-            if w*h<48_000_000:raise ValueError(f'DNG hat nur {w} × {h} Pixel; 48 MP erforderlich')
+            minimum=12_000_000 if job['format']=='proraw12tele' else 48_000_000
+            if w*h<minimum:raise ValueError(f'DNG hat nur {w} × {h} Pixel; {minimum//1_000_000} MP erforderlich')
+            if job['format']=='proraw12tele':
+                meta=job['metadata']
+                if meta.get('camera')!='tele' or meta.get('physical_camera')!='AVCaptureDeviceTypeBuiltInTelephotoCamera' or meta.get('zoom_factor')!=1:raise ValueError('Echte Telekamera ohne Digitalzoom nicht nachgewiesen')
             tmp.replace(dest)
             meta=dict(job['metadata']);meta.update({'capture_id':ident,'verified_dng_dimensions':[w,h],'request':job['context'],'requested_focus':job['focus'],'stored_at':time.time()})
             dest.with_suffix('.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2,allow_nan=False))
@@ -106,7 +113,7 @@ def run_status(message,done,total):
         if done is not None:RUN['done']=done
         if total is not None:RUN['total']=total
 async def capture_wait(shot,config):
-    ident=enqueue_capture(shot['focus'],config.get('lock_exposure',True),dict(shot,pass_index=RUN.get('pass_index',1)))
+    ident=enqueue_capture(shot['focus'],config.get('lock_exposure',True),dict(shot,pass_index=RUN.get('pass_index',1),camera=config.get('camera','wide')))
     for _ in range(1800):
         if time.monotonic()-MOTION.get('received',0)>3:raise RuntimeError('iPhone-Verbindung während Aufnahme unterbrochen')
         j=JOBS[ident]
@@ -159,7 +166,10 @@ async def start_run(config,resume=False):
     if any(j['status'] in ('pending','delivered') and j['expires']>time.time() for j in JOBS.values()):raise ValueError('Fotoaufnahme läuft bereits')
     if not CLIENT or not CLIENT.is_connected:raise ValueError('Gimbal zuerst verbinden')
     shots=[] if config.get('mode')=='level' else plan(config)
-    if shots and not PHONE.get('proraw48'):raise ValueError('48-MP-ProRAW noch nicht bereit')
+    if shots:
+        if config.get('camera')=='tele':
+            if PHONE.get('camera')!='tele' or not PHONE.get('raw_ready'):raise ValueError('3×-Telekamera noch nicht bereit')
+        elif not PHONE.get('proraw48'):raise ValueError('48-MP-ProRAW noch nicht bereit')
     if shutil.disk_usage(PHOTOS).free<len(shots)*130_000_000+1_000_000_000:raise ValueError('Nicht genug Speicher für diese Reihe (Planung mit 130 MB je Foto)')
     controller=Controller(motion_snapshot,automation_send,capture_wait,run_status,finish_run);controller.sample()
     if resume:
@@ -170,6 +180,40 @@ async def start_run(config,resume=False):
         RUN.clear();RUN.update(pass_index=1,awaiting_turn=False)
     RUN.update(active=True,done=0,total=len(shots),message='Start',config=config,folder=str(RUN_DIR));CONTROLLER=controller
     controller.task=asyncio.create_task(controller.run(config,shots))
+def tele_grid_config(phone,overlap=.25):
+    if phone.get('camera')!='tele' or phone.get('physical_camera')!='AVCaptureDeviceTypeBuiltInTelephotoCamera' or phone.get('zoom_factor')!=1 or not phone.get('raw_ready'):
+        raise ValueError('Physische 3×-Telekamera nicht bestätigt')
+    h=phone.get('portrait_hfov',0);v=phone.get('portrait_vfov',0)
+    if not all(isinstance(x,(float,int)) and math.isfinite(x) for x in (h,v,overlap)) or not (10<h<40 and h<v<50 and .2<=overlap<=.4):raise ValueError('Unplausibler Tele-Bildwinkel')
+    # Fraction of angular field, with 25% as the initial requested low-overlap setting.
+    step=h*(1-overlap);pitch=v*(1-overlap)
+    if step<10 or pitch>30:raise ValueError('Bildwinkel außerhalb des geprüften 3×3-Bereichs')
+    return dict(mode='panorama',camera='tele',half_span=step,step=step,pitch_span=pitch,focus_count=1,repeat=1,lock_exposure=False,two_pass=False,overlap=overlap,source_hfov=h,source_vfov=v)
+
+async def configure_camera(name):
+    if name not in ('wide','tele'):raise ValueError('Unbekannte Kamera')
+    if RUN.get('active') or RUN.get('awaiting_turn') or MOVING:raise ValueError('Laufende Reihe zuerst beenden')
+    if time.time()-PHONE['seen']>5:raise ValueError('iPhone im neuen WLAN verbinden')
+    if PHONE.get('protocol_version',0)<3:raise ValueError('Neue iPhone-App für 3× installieren')
+    if any(j['status'] in ('pending','delivered') and j['expires']>time.time() for j in JOBS.values()):raise ValueError('Kameraauftrag läuft bereits')
+    ident=uuid.uuid4().hex;JOBS[ident]=dict(id=ident,kind='camera',camera=name,status='pending',expires=time.time()+18)
+    RUN['active']=True;run_status('Physische Kamera umstellen …',None,None)
+    try:
+        for _ in range(170):
+            job=JOBS[ident]
+            if job['status']=='complete':return
+            if job['status'] in ('failed','expired'):raise RuntimeError(job.get('error','Kamerawechsel abgebrochen'))
+            await asyncio.sleep(.1)
+        raise RuntimeError('iPhone bestätigt Kamerawechsel nicht')
+    finally:
+        if JOBS[ident]['status'] in ('pending','delivered'):JOBS[ident]['status']='expired'
+        RUN['active']=False
+
+async def start_tele_grid():
+    if not CLIENT or not CLIENT.is_connected:raise ValueError('Gimbal zuerst verbinden')
+    await configure_camera('tele')
+    await start_run(tele_grid_config(PHONE))
+
 async def export_wide(folder):
     run_status('360°-Bild in voller Auflösung berechnen; fehlende Bereiche bleiben schwarz …',None,None)
     log_path=folder/'360-Berechnung.log'
@@ -209,6 +253,9 @@ async def continue_run():
     if angle<155:raise ValueError(f'Erst den Griff um etwa 180° drehen; bisher sind es {angle:.0f}°')
     await start_run(dict(RUN['config']),resume=True)
 async def abort_run():
+    for job in JOBS.values():
+        if job.get('kind')=='camera' and job['status'] in ('pending','delivered'):
+            job['status']='expired';run_status('Kamerawechsel abgebrochen',None,None)
     if RUN.get('awaiting_turn'):
         RUN['awaiting_turn']=False;run_status('Rundumreihe beendet; bisherige Fotos bleiben gespeichert',None,None)
     if CONTROLLER:CONTROLLER.abort()
@@ -244,6 +291,15 @@ class Handler(BaseHTTPRequestHandler):
                     if not isinstance(meta,dict):raise ValueError('Ungültige Metadaten')
                     json.dumps(meta,allow_nan=False);j['metadata']=meta
                 return self.respond(200,{'ok':True})
+            if path=='/phone/configured' and self.command=='POST':
+                with LOCK:
+                    job=JOBS.get(body.get('id'))
+                    if not job or job.get('kind')!='camera' or job['status']!='delivered':raise ValueError('Kein aktiver Kamerawechsel')
+                    if body.get('camera')!=job['camera']:raise ValueError('Falsche Kamera bestätigt')
+                    PHONE.update({k:body.get(k) for k in ('camera','physical_camera','zoom_factor','raw_ready','photo_width','photo_height','portrait_hfov','portrait_vfov')})
+                    PHONE.update(proraw48=body.get('camera')=='wide' and body.get('raw_ready') is True and body.get('photo_width',0)*body.get('photo_height',0)>=48_000_000,resolution=f"{body.get('camera')} · ProRAW · {body.get('photo_width')} × {body.get('photo_height')}",seen=time.time())
+                    job['status']='complete'
+                return self.respond(200,{'ok':True})
             if path=='/phone/next' and self.command=='GET':return self.respond(200,next_job())
             if path=='/phone/hello' and self.command=='POST':
                 with LOCK:PHONE.update(seen=time.time(),name=str(body.get('name','iPhone'))[:80],resolution=str(body.get('resolution',''))[:80],proraw48=body.get('proraw48') is True,protocol_version=body.get('protocol_version',1))
@@ -254,7 +310,7 @@ class Handler(BaseHTTPRequestHandler):
                     EVENT='iPhone: '+str(body.get('error','Unbekannter Fehler'))[:300]
                 return self.respond(200,{'ok':True})
             if path=='/state' and self.command=='GET':
-                return self.respond(200,{'gimbal':DEVICE if CLIENT and CLIENT.is_connected else '', 'phone':PHONE['name'] if time.time()-PHONE['seen']<5 else '', 'resolution':PHONE['resolution'],'event':EVENT,'moving':MOVING,'latest':LATEST,'photos':str(PHOTOS),'motion':dict(MOTION),'motion_fresh':time.monotonic()-MOTION.get('received',0)<1.5,'run':dict(RUN),'proraw48':PHONE.get('proraw48',False)})
+                return self.respond(200,{'gimbal':DEVICE if CLIENT and CLIENT.is_connected else '', 'phone':PHONE['name'] if time.time()-PHONE['seen']<5 else '', 'resolution':PHONE['resolution'],'event':EVENT,'moving':MOVING,'latest':LATEST,'photos':str(PHOTOS),'camera_state':{k:PHONE.get(k) for k in ('camera','physical_camera','zoom_factor','raw_ready','photo_width','photo_height','portrait_hfov','portrait_vfov')},'motion':dict(MOTION),'motion_fresh':time.monotonic()-MOTION.get('received',0)<1.5,'run':dict(RUN),'proraw48':PHONE.get('proraw48',False)})
             if self.command!='POST':return self.respond(404,{'error':'Nicht gefunden'})
             if path=='/connect':ble_run(connect_gimbal())
             elif path=='/move':
@@ -265,6 +321,8 @@ class Handler(BaseHTTPRequestHandler):
             elif path=='/process':ble_run(process_latest())
             elif path=='/continue':ble_run(continue_run())
             elif path=='/wide':ble_run(start_wide())
+            elif path=='/tele-grid':ble_run(start_tele_grid())
+            elif path=='/camera':ble_run(configure_camera(body.get('camera')))
             elif path=='/level':ble_run(start_run({'mode':'level'}))
             elif path=='/capture':
                 if RUN['active']:raise ValueError('Automatische Reihe läuft')

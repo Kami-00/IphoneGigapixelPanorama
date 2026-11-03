@@ -8,7 +8,7 @@ Der bisherige lokale Entwicklungsstand ist jetzt enthalten: **OsmoStudio** (Mac/
 
 **[Einrichtung, Startbefehle, Datenfluss und geprüfter Stand](docs/IMPLEMENTIERUNGSSTAND.md)**
 
-Der importierte Aufnahmeweg verwendet die **1×-Hauptkamera mit 48-MP-ProRAW**. Die folgenden 3×-Ziele bleiben die nächste Entwicklungsstufe; sie sind durch den Import nicht umgesetzt.
+Der importierte Aufnahmeweg verwendet die **1×-Hauptkamera mit 48-MP-ProRAW**. Zusätzlich ist ein reales **3×3-Telepanorama mit neun 12-MP-ProRAW-Aufnahmen** implementiert und geprüft. Der folgende vollständige 3×-Rundumlauf bleibt die nächste Entwicklungsstufe.
 
 ## Jetzt zuerst: ein einfacher 360°-Durchlauf
 

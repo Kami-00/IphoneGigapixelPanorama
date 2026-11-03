@@ -4,7 +4,7 @@ from scipy.spatial.transform import Rotation
 from scipy.optimize import least_squares
 from scipy.sparse import lil_matrix
 
-def estimate(images,metas):
+def estimate(images,metas,focal_35mm=24,require_connected=False):
  n=len(images);detector=cv.SIFT_create(nfeatures=14000,contrastThreshold=.015)
  features=[cv.detail.computeImageFeatures2(detector,im) for im in images]
  for i,f in enumerate(features):f.img_idx=i
@@ -12,7 +12,7 @@ def estimate(images,metas):
  vectors=np.stack([np.sin(hs)*np.cos(es),np.sin(es),np.cos(hs)*np.cos(es)],axis=1)
  mask=(vectors@vectors.T>math.cos(math.radians(70))).astype(np.uint8);np.fill_diagonal(mask,0)
  matcher=cv.detail.BestOf2NearestMatcher_create(False,.35);matches=matcher.apply2(features,mask);matcher.collectGarbage()
- f0=24/math.sqrt(36**2+24**2)*math.hypot(images[0].shape[1],images[0].shape[0]);pps=np.array([[im.shape[1]/2,im.shape[0]/2] for im in images])
+ f0=focal_35mm/math.sqrt(36**2+24**2)*math.hypot(images[0].shape[1],images[0].shape[0]);pps=np.array([[im.shape[1]/2,im.shape[0]/2] for im in images])
  pairs=[]
  for i in range(n):
   for j in range(i+1,n):
@@ -25,6 +25,7 @@ def estimate(images,metas):
    pairs.append((i,j,p,q))
  def rays(p,index,f,R):
   xy=(p-pps[index])/f;v=np.column_stack([xy,np.ones(len(xy))]);v/=np.linalg.norm(v,axis=1)[:,None];return v@R.T
+ if not pairs:raise RuntimeError("Keine verlässlichen Bildverbindungen")
  candidates=[]
  for hsign in [-1,1]:
   for rsign in [-1,1]:
@@ -39,6 +40,13 @@ def estimate(images,metas):
   if good.sum()>=8:filtered.append((i,j,p[good],q[good]))
  pairs=filtered
  if not pairs:raise RuntimeError('Keine zum Gyro passenden Bildmerkmale')
+ if require_connected:
+  reached={0}
+  while True:
+   more={j for i,j,_,_ in pairs if i in reached}|{i for i,j,_,_ in pairs if j in reached}
+   if more<=reached:break
+   reached|=more
+  if len(reached)!=n:raise RuntimeError('Nicht alle Telebilder haben gyro-geprüfte Merkmalsverbindungen')
  print('Gyro-geprüfte Verbindungen',[(i,j,len(p)) for i,j,p,q in pairs],flush=True)
  rows=sum(len(p)*3 for _,_,p,_ in pairs);sparsity=lil_matrix((rows+3*n+1,3*n+1),dtype=int);cursor=0
  for i,j,p,q in pairs:

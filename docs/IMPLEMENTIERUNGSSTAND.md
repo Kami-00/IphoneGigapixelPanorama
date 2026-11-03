@@ -48,7 +48,7 @@ Die Datensätze verbleiben lokal und sind hier nicht mitgeliefert. Ein erneuter 
 
 ## Offene Arbeit
 
-- Der im Konzept priorisierte echte 3×-Tele-Ring wurde nicht implementiert oder nachgewiesen. Der bestehende Dienst verlangt 48-MP-DNGs und muss dafür gezielt angepasst werden.
+- Der echte 3×-Tele-Ring über 360° bleibt offen. Ein 3×3-Teleraster mit neun einzelnen 12-MP-ProRAW-Aufnahmen ist inzwischen implementiert und real geprüft (siehe unten).
 - Nachtmodus, astronomische Nachführung und Video-Zeitraffer wurden besprochen, sind aber noch nicht implementiert.
 - Die vollständige reale Zweipass-Aufnahme und verlässliche Rollkorrektur sind nicht nachgewiesen.
 - Portable Pfade der Hauptstarter wurden für den Import angepasst; lokale historische Anleitungstexte enthalten teilweise ursprüngliche Rechnerpfade. Diese Datei beschreibt den Einstieg im Repository.
@@ -64,3 +64,21 @@ Die Datensätze verbleiben lokal und sind hier nicht mitgeliefert. Ein erneuter 
 Die Prüfungen decken unter anderem Steuergrenzen, veraltete Sensordaten, Zweipass-Zustände, PNG-Pixelerhalt, Mittelwert/Median und Fokusfusion ab. Sie ersetzen keinen Hardware- oder Bildqualitätstest.
 
 Importprüfung am 02.11.2026: 23 OsmoStudio-, 2 Superresolution- und 4 FocusStack-Tests bestanden (29 insgesamt). Beide Mac-Apps aus dem Repository erfolgreich gebaut; OsmoStudio meldet eine bestehende SwiftUI-Deprecation-Warnung. Geheimnisscan ohne Treffer. Die iPhone-App wurde bei diesem Import nicht erneut gebaut oder installiert; keine neue Hardwareaufnahme durchgeführt.
+
+## Ergänzung: 3×3-Telepanorama und WLAN-Wechsel (02.11.2026)
+
+Die Mac-App erneuert den Verbindungslink aus der aktuellen Netzadresse bei der Statusaktualisierung. Nach WLAN-Wechsel den neuen QR-Code/Link verwenden; die iPhone-App erneut verbinden.
+
+Der Knopf „3×3-Panorama · echte 3×-Telekamera“ schaltet auf die physische Telekamera (Zoomfaktor 1 auf diesem Objektiv), bestätigt RAW-Verfügbarkeit und plant neun Positionen mit 25 % Winkelüberlappung. Eine Auslösung pro Position, keine Wiederholungsstapel. Der Knopf „Zurück zur 1×-Hauptkamera“ stellt den bisherigen 48-MP-Weg wieder her.
+
+Für ProRAW muss ein Format mit `isHighestPhotoQualitySupported` gewählt werden. Der erste Versuch mit einem beliebigen 12-MP-Format wurde deshalb vor der Bewegung abgewiesen. Der korrigierte Hardwarelauf lieferte neun 4032 × 3024 DNGs; EXIF bestätigte 9 mm / 77 mm Kleinbildäquivalent. Gemeldeter Hochformat-Bildwinkel 19,07° × 25,25°, Schritte 14,30° × 18,94°.
+
+Die Standardmerkmalsuche konnte nicht alle neun Ansichten verbinden. Der Telepfad nutzt daher SIFT mit gespeicherten Gyro-Winkeln, 77-mm-Brennweiteninitialisierung und einer vollständig verbundenen, gyro-geprüften Merkmalsstruktur. Native Projektion und schmale Nahtüberblendung bleiben erhalten. Reales Ergebnis: 7395 × 9866 Pixel, alle neun Quellen; Gesamtansicht geprüft. Keine vollständige 360°-Abdeckung und kein Nachweis perfekter Kanten an jeder Tiefe.
+
+27 Steuerungs-/Verarbeitungstests bestanden, iPhone-Build und drahtlose Installation erfolgreich. Die beiden lokalen Arbeitskopien wurden für diesen Versuch aktualisiert. Rohbilder bleiben außerhalb des Git-Repositories.
+
+## Kartenwand: lokale Ausrichtung (02.11.2026)
+
+`OsmoStudio/planar_stitch.py <Aufnahmeordner>` verarbeitet vorhandene PNGs aus `Entwickelt` als annähernd flaches Motiv. Gemeinsame perspektivische Ausrichtung, Ausschluss widersprüchlicher Logo-Zuordnungen und ein geglättetes lokales Korrekturgitter reduzieren Kantenversatz. Originalpixel werden erst beim finalen Rendern interpoliert; schmale Nahtüberblendung. Dieser separate Versuch ersetzt nicht den Standardweg für Räume oder 360°.
+
+An den neun Teleaufnahmen sank der Median der paarweisen Kontrollpunkt-Mediane von 2,36 Pixeln (globale Flächenausrichtung) auf 0,64 Pixel (lokales Gitter). Diese Kontrollpunkte wurden nicht zur Anpassung verwendet. Die Zahlen vergleichen die beiden neuen Ausrichtungsstufen, nicht das alte sphärische Panorama. Vier Detailausschnitte visuell geprüft; Kunststoffblister, Reflexionen und andere Tiefen bleiben mögliche Restfehler. Vollständige Ausgabe mit schwarzen Außenflächen: 9670 × 12801 Pixel. Alte Ergebnisse und Quellen bleiben erhalten. Drei gezielte Tests prüfen Pixelidentität, inverse Verschiebung und Projektionsnormalisierung.

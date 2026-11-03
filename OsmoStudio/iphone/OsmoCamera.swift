@@ -43,14 +43,15 @@ final class MotionSensor {
 final class PhotoReceiver:NSObject,AVCapturePhotoCaptureDelegate {
     let done:(Result<CapturedPhoto,Error>)->Void
     let motion:MotionSensor
+    let minimumPixels:Int64
     var result:CapturedPhoto?,failure:Error?,atShutter:[String:Any]=[:]
-    init(motion:MotionSensor,_ done:@escaping(Result<CapturedPhoto,Error>)->Void){self.motion=motion;self.done=done}
+    init(motion:MotionSensor,minimumPixels:Int64=48_000_000,_ done:@escaping(Result<CapturedPhoto,Error>)->Void){self.motion=motion;self.minimumPixels=minimumPixels;self.done=done}
     func photoOutput(_ output:AVCapturePhotoOutput,willCapturePhotoFor resolvedSettings:AVCaptureResolvedPhotoSettings){atShutter=motion.snapshot()}
     func photoOutput(_ output:AVCapturePhotoOutput,didFinishProcessingPhoto photo:AVCapturePhoto,error:Error?){
         if let error=error{failure=error;return}
         guard let data=photo.fileDataRepresentation(),photo.isRawPhoto else{failure=NSError(domain:"Camera",code:1,userInfo:[NSLocalizedDescriptionKey:"Kein ProRAW-DNG geliefert"]);return}
         let d=photo.resolvedSettings.rawPhotoDimensions
-        guard Int64(d.width)*Int64(d.height)>=48_000_000 else{failure=NSError(domain:"Camera",code:2,userInfo:[NSLocalizedDescriptionKey:"Kamera lieferte nur \(d.width) × \(d.height) RAW-Pixel; 48 MP sind erforderlich."]);return}
+        guard Int64(d.width)*Int64(d.height)>=minimumPixels else{failure=NSError(domain:"Camera",code:2,userInfo:[NSLocalizedDescriptionKey:"Kamera lieferte nur \(d.width) × \(d.height) RAW-Pixel; die erwartete Auflösung fehlt."]);return}
         let timestamp=CMTimeGetSeconds(photo.timestamp)
         var meta:[String:Any]=["format":"Apple ProRAW DNG","width":d.width,"height":d.height,"shutter_motion":atShutter,"motion_samples":motion.around(timestamp),"sensor_frame":"portrait device; arbitrary vertical reference; heading relative, not compass"]
         if timestamp.isFinite{meta["camera_timestamp"]=timestamp}
@@ -81,7 +82,7 @@ final class Camera:NSObject,ObservableObject {
                     guard self.session.canAddInput(input),self.session.canAddOutput(self.output) else{throw NSError(domain:"Camera",code:2,userInfo:[NSLocalizedDescriptionKey:"Kamerasitzung nicht verfügbar"])}
                     self.session.addInput(input);self.session.addOutput(self.output)
                     // Choose a photo-capable format exposing the largest genuine photo dimensions.
-                    if let format=d.formats.filter({!$0.supportedMaxPhotoDimensions.isEmpty}).max(by:{a,b in
+                    if let format=d.formats.filter({$0.isHighestPhotoQualitySupported && !$0.supportedMaxPhotoDimensions.isEmpty}).max(by:{a,b in
                         (a.supportedMaxPhotoDimensions.map{Int64($0.width)*Int64($0.height)}.max() ?? 0) < (b.supportedMaxPhotoDimensions.map{Int64($0.width)*Int64($0.height)}.max() ?? 0)
                     }) {try d.lockForConfiguration();d.activeFormat=format;d.unlockForConfiguration()}
                     if let dimensions=d.activeFormat.supportedMaxPhotoDimensions.max(by:{Int64($0.width)*Int64($0.height)<Int64($1.width)*Int64($1.height)}) {self.output.maxPhotoDimensions=dimensions}
@@ -92,6 +93,45 @@ final class Camera:NSObject,ObservableObject {
                     let supported=self.output.isAppleProRAWEnabled && self.output.availableRawPhotoPixelFormatTypes.contains(where:AVCapturePhotoOutput.isAppleProRAWPixelFormat) && Int64(size.width)*Int64(size.height)>=48_000_000
                     DispatchQueue.main.async{self.ready=true;self.proRAW48=supported;self.info=supported ? "48 MP Apple ProRAW · \(size.width) × \(size.height)" : "48-MP-ProRAW in dieser Konfiguration nicht verfügbar"}
                 }catch{self.session.commitConfiguration();DispatchQueue.main.async{self.info=error.localizedDescription}}
+            }
+        }
+    }
+    private var tele=false
+    func cameraState() -> [String:Any] {
+        guard let d=device else{return [:]}
+        let size=output.maxPhotoDimensions
+        let v=Double(d.activeFormat.videoFieldOfView)
+        let h=2*atan(tan(v*Double.pi/360)*Double(min(size.width,size.height))/Double(max(size.width,size.height)))*180/Double.pi
+        return ["camera":tele ? "tele" : "wide", "physical_camera":d.deviceType.rawValue, "zoom_factor":Double(d.videoZoomFactor), "raw_ready":output.isAppleProRAWEnabled && output.availableRawPhotoPixelFormatTypes.contains(where:AVCapturePhotoOutput.isAppleProRAWPixelFormat), "photo_width":size.width, "photo_height":size.height, "portrait_hfov":h, "portrait_vfov":v]
+    }
+    func selectCamera(_ name:String) async throws -> [String:Any] {
+        guard name=="tele" || name=="wide" else{throw NSError(domain:"Camera",code:8,userInfo:[NSLocalizedDescriptionKey:"Unbekannte Kamera"])}
+        return try await withCheckedThrowingContinuation { continuation in
+            queue.async {
+                guard self.delegate==nil else{continuation.resume(throwing:NSError(domain:"Camera",code:8,userInfo:[NSLocalizedDescriptionKey:"Eine Aufnahme läuft"]));return}
+                let oldInputs=self.session.inputs
+                self.session.stopRunning();self.session.beginConfiguration()
+                do {
+                    guard let d=AVCaptureDevice.default(name=="tele" ? .builtInTelephotoCamera : .builtInWideAngleCamera,for:.video,position:.back) else{throw NSError(domain:"Camera",code:8,userInfo:[NSLocalizedDescriptionKey:"Physische Kamera fehlt"])}
+                    for input in oldInputs{self.session.removeInput(input)}
+                    let input=try AVCaptureDeviceInput(device:d)
+                    guard self.session.canAddInput(input) else{throw NSError(domain:"Camera",code:8,userInfo:[NSLocalizedDescriptionKey:"Kamerawechsel nicht möglich"])}
+                    self.session.addInput(input)
+                    if let format=d.formats.filter({$0.isHighestPhotoQualitySupported && !$0.supportedMaxPhotoDimensions.isEmpty}).max(by:{a,b in
+                        (a.supportedMaxPhotoDimensions.map{Int64($0.width)*Int64($0.height)}.max() ?? 0) < (b.supportedMaxPhotoDimensions.map{Int64($0.width)*Int64($0.height)}.max() ?? 0)
+                    }) {try d.lockForConfiguration();d.activeFormat=format;d.videoZoomFactor=1;d.unlockForConfiguration()}
+                    if let size=d.activeFormat.supportedMaxPhotoDimensions.max(by:{Int64($0.width)*Int64($0.height)<Int64($1.width)*Int64($1.height)}) {self.output.maxPhotoDimensions=size}
+                    self.output.isAppleProRAWEnabled=self.output.isAppleProRAWSupported
+                    self.device=d;self.tele=name=="tele"
+                    self.session.commitConfiguration();self.session.startRunning()
+                    let state=self.cameraState(),size=self.output.maxPhotoDimensions
+                    DispatchQueue.main.async{self.proRAW48 = !self.tele && Int64(size.width)*Int64(size.height)>=48_000_000;self.info="\(self.tele ? "3× Tele" : "1× Hauptkamera") · ProRAW · \(size.width) × \(size.height)"}
+                    continuation.resume(returning:state)
+                } catch {
+                    for input in self.session.inputs{self.session.removeInput(input)}
+                    for input in oldInputs where self.session.canAddInput(input){self.session.addInput(input)}
+                    self.session.commitConfiguration();self.session.startRunning();continuation.resume(throwing:error)
+                }
             }
         }
     }
@@ -108,12 +148,12 @@ final class Camera:NSObject,ObservableObject {
                     else if d.isExposureModeSupported(.continuousAutoExposure){d.exposureMode = .continuousAutoExposure}
                     d.unlockForConfiguration()
                     self.queue.asyncAfter(deadline:.now()+0.7){
-                        guard let raw=self.output.availableRawPhotoPixelFormatTypes.first(where:AVCapturePhotoOutput.isAppleProRAWPixelFormat),Int64(self.output.maxPhotoDimensions.width)*Int64(self.output.maxPhotoDimensions.height)>=48_000_000 else{continuation.resume(throwing:NSError(domain:"Camera",code:4,userInfo:[NSLocalizedDescriptionKey:"48-MP-ProRAW nicht verfügbar"]));return}
+                        guard let raw=self.output.availableRawPhotoPixelFormatTypes.first(where:AVCapturePhotoOutput.isAppleProRAWPixelFormat),Int64(self.output.maxPhotoDimensions.width)*Int64(self.output.maxPhotoDimensions.height)>=(self.tele ? 12_000_000 : 48_000_000) else{continuation.resume(throwing:NSError(domain:"Camera",code:4,userInfo:[NSLocalizedDescriptionKey:"ProRAW in der gewählten Kameraauflösung nicht verfügbar"]));return}
                         let sample=self.motion.snapshot()
                         guard sample["stable"] as? Bool==true,Date().timeIntervalSince1970-(sample["wall_time"] as? Double ?? 0)<0.5 else{continuation.resume(throwing:NSError(domain:"Motion",code:2,userInfo:[NSLocalizedDescriptionKey:"Bewegung während der Aufnahmevorbereitung – abgebrochen"]));return}
                         let settings=AVCapturePhotoSettings(rawPixelFormatType:raw);settings.maxPhotoDimensions=self.output.maxPhotoDimensions;settings.photoQualityPrioritization = .quality
                         if self.output.supportedFlashModes.contains(.off){settings.flashMode = .off}
-                        let receiver=PhotoReceiver(motion:self.motion){result in self.queue.async{self.delegate=nil};continuation.resume(with:result.map{photo in var p=photo;p.metadata["lens_position"]=d.lensPosition;p.metadata["iso"]=d.iso;p.metadata["exposure_seconds"]=CMTimeGetSeconds(d.exposureDuration);return p})}
+                        let receiver=PhotoReceiver(motion:self.motion,minimumPixels:self.tele ? 12_000_000 : 48_000_000){result in self.queue.async{self.delegate=nil};continuation.resume(with:result.map{photo in var p=photo;p.metadata.merge(self.cameraState(),uniquingKeysWith: { _,new in new });p.metadata["lens_position"]=d.lensPosition;p.metadata["iso"]=d.iso;p.metadata["exposure_seconds"]=CMTimeGetSeconds(d.exposureDuration);return p})}
                         self.delegate=receiver;self.output.capturePhoto(with:settings,delegate:receiver)
                     }
                 }catch{continuation.resume(throwing:error)}
@@ -158,11 +198,19 @@ struct Preview:UIViewRepresentable {
     }
     func loop() async {
         do{
-            _ = try await request("phone/hello",json:["name":UIDevice.current.name,"resolution":camera.info,"proraw48":camera.proRAW48,"protocol_version":2]);connected=true;UIApplication.shared.isIdleTimerDisabled=true;status=camera.proRAW48 ? "Verbunden. 48-MP-ProRAW bereit." : "Verbunden, aber 48-MP-ProRAW nicht verfügbar."
+            _ = try await request("phone/hello",json:["name":UIDevice.current.name,"resolution":camera.info,"proraw48":camera.proRAW48,"protocol_version":3]);connected=true;UIApplication.shared.isIdleTimerDisabled=true;status=camera.proRAW48 ? "Verbunden. 48-MP-ProRAW bereit." : "Verbunden, aber 48-MP-ProRAW nicht verfügbar."
             telemetryTask=Task{while !Task.isCancelled{var sample=camera.motion.snapshot();sample["proraw48"]=camera.proRAW48;_ = try? await request("phone/motion",json:sample);try? await Task.sleep(nanoseconds:150_000_000)}}
             while !Task.isCancelled {
                 let job=try await request("phone/next")
-                if let id=job["id"] as? String,job["kind"] as? String=="capture" {
+                if let id=job["id"] as? String,job["kind"] as? String=="camera" {
+                    do {
+                        status="Kamera wird umgestellt …"
+                        var state=try await camera.selectCamera(job["camera"] as? String ?? "wide")
+                        state["id"]=id
+                        _ = try await request("phone/configured",json:state)
+                        status="Kamera bereit."
+                    } catch {_ = try? await request("phone/error",json:["id":id,"error":error.localizedDescription])}
+                } else if let id=job["id"] as? String,job["kind"] as? String=="capture" {
                     do{
                         status="Foto wird aufgenommen …"
                         let photo=try await camera.capture(focus:(job["focus"] as? NSNumber)?.floatValue ?? -1,lockExposure:job["lock_exposure"] as? Bool ?? false)
