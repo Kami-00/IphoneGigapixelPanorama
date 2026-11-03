@@ -8,11 +8,11 @@ Mac-gesteuerte iPhone-Panoramen. **Der erste Meilenstein ist eine funktionierend
 
 Aufnahme vom 02.11.2026: 14 ProRAW-Einzelbilder, als Raster 7 × 2 im Serpentinenweg aufgenommen und über eine planare Homographie in nativen Pixeln zusammengesetzt. Ergebnis **13474 × 5941 Pixel (80 Megapixel)**, keine Nahtlücken, keine unbedeckten Flächen. Der mittlere Ausrichtungsfehler sank von 26,57 auf 2,26 Pixel; 26 Bildpaare wurden verwendet, 3 widersprüchliche verworfen. Rechenzeit 34 Sekunden.
 
-Das Bild oben ist auf 1600 Pixel Breite verkleinert. Derselbe Bestand in voller Auflösung, 1:1 ohne Skalierung, Ausschnitt ab Position 305 / 978:
+Das Bild oben ist auf 1600 Pixel Breite verkleinert. Hier ein Ausschnitt in voller Auflösung, 1:1 ohne Skalierung: das Hinterrad des 1965 Shelby Cobra 427 S/C, fünftes Auto von links in der oberen Reihe. 820 × 440 Pixel ab Position 8598 / 1744 des Gesamtbildes.
 
-![Ausschnitt in voller Auflösung, Text auf den Verpackungen lesbar](docs/bilder/hotwheels-redline-ausschnitt.jpg)
+![Hinterrad des Shelby Cobra in voller Auflösung, Schriftzug auf der Reifenflanke lesbar](docs/bilder/hotwheels-redline-ausschnitt.jpg)
 
-Das vollständige Bild liegt nicht im Repository; `Ergebnisse/` bleibt ausgeschlossen. Die beiden Bilder hier sind verkleinerte Belege, zusammen rund 400 KB.
+Das vollständige Bild liegt nicht im Repository; `Ergebnisse/` bleibt ausgeschlossen. Die beiden Bilder hier sind verkleinerte Belege, zusammen rund 330 KB.
 
 ## Vorhandener Quellcode (Stand 02.11.2026)
 
